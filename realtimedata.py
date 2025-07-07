@@ -16,6 +16,7 @@ def earnings():
     earningsdata = r.json()
     return earningsdata
 
+
 def newstech():
     url = ""
     r = requests.get(url)
