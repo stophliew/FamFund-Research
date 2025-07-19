@@ -3,6 +3,8 @@ from openai import OpenAI
 import requests
 import json
 import os
+import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
 
 # data pipeline
 
@@ -68,10 +70,41 @@ def openai_websearch(query):
     )
     return response.choices[0].message.content.strip()
 
+# Add OpenAI embedding function
+
+def get_embedding(text):
+    response = client.embeddings.create(
+        model="text-embedding-ada-002",
+        input=text
+    )
+    return np.array(response.data[0].embedding)
+
+# Prepare local RAG corpus (chunked)
+local_docs = []
+for label, data in zip([
+    "News", "Insider Trading", "Gainers and Losers"], [news, insidertrading, gandl]):
+    # Chunk each source into smaller pieces (here, just split by top-level keys for demo)
+    if isinstance(data, dict):
+        for k, v in list(data.items())[:10]:  # limit for demo
+            chunk = f"{label} - {k}: {str(v)[:500]}"
+            local_docs.append(chunk)
+    else:
+        local_docs.append(f"{label}: {str(data)[:1000]}")
+
+# Embed all local docs
+local_doc_embeddings = [get_embedding(doc) for doc in local_docs]
+
+def retrieve_relevant_local_chunks(query, top_k=3):
+    query_emb = get_embedding(query)
+    sims = cosine_similarity([query_emb], local_doc_embeddings)[0]
+    top_indices = np.argsort(sims)[-top_k:][::-1]
+    return [local_docs[i] for i in top_indices]
+
 # Step 1: Gather external data from Sonar and OpenAI websearch
 user_query = "What are the most relevant financial news and trends for NASDAQ investments this week?"
 sonar_results = sonar_search(user_query)
 openai_web_results = openai_websearch(user_query)
+local_rag_chunks = retrieve_relevant_local_chunks(user_query)
 
 # Step 2: LLM (funnel) - Generate investment recommendations
 llm_prompt = (
@@ -79,6 +112,7 @@ llm_prompt = (
     "You are a RAG-agent and have external resources from the datasets provided. "
     "Please output five companies and their NASDAQ symbols based on the following criteria: "
     "Income statement, current stock price, geopolitical issues, and insider trading activities. "
+    f"\nLocal RAG context: {' | '.join(local_rag_chunks)}\n"
     f"Market data: {news}, {insidertrading}, {gandl}. "
     f"\nRelevant web search (Sonar): {sonar_results}\n"
     f"Relevant web search (OpenAI): {openai_web_results}\n"
