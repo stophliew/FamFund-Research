@@ -2,6 +2,7 @@ import yfinance as yf
 from openai import OpenAI
 import requests
 import json
+import os
 
 # data pipeline
 
@@ -11,7 +12,7 @@ r = requests.get(url)
 news = r.json()
 
 # insider trading
-url = "https://www.alphavantage.co/query?function=INSIDER_TRANSACTIONS&symbol=IBM&apikey=DXL7K0GZEMR3P8RZ" 
+url = "https://www.alphavantage.co/query?function=INSIDER_TRANSACTIONS&symbol=IBM&apikey=DXL7K0GZEMR3P8RZ"
 r = requests.get(url)
 insidertrading = r.json()
 
@@ -33,13 +34,41 @@ client = OpenAI(
     "r3pSbXyIbGokvYOGbVRPqFOQpQGRmG2VOdn-pVpHcA"
 )
 
+# Add Perplexity Sonar API integration
+SONAR_API_KEY = os.getenv("SONAR_API_KEY") or "YOUR_SONAR_API_KEY"
+SONAR_API_URL = "https://openrouter.ai/api/v1/chat/completions"
+SONAR_MODEL = "perplexity/sonar"
+
+def sonar_search(query):
+    headers = {
+        "Authorization": f"Bearer {SONAR_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "model": SONAR_MODEL,
+        "messages": [
+            {"role": "user", "content": query}
+        ]
+    }
+    response = requests.post(SONAR_API_URL, headers=headers, json=data)
+    if response.status_code == 200:
+        result = response.json()
+        return result["choices"][0]["message"]["content"]
+    else:
+        return f"Sonar API error: {response.status_code} {response.text}"
+
+# Example: Use Sonar to get relevant search results for the investment prompt
+user_query = "What are the most relevant financial news and trends for NASDAQ investments this week?"
+sonar_results = sonar_search(user_query)
+
 prompt = (
-    "You're an investment consultant, advising a community on what investments to make" 
-    "You are a RAG-agent and have external resources from the datasets provided" 
-    "Please output five companies and their NASDAQ symbols based on the following criteria" 
-    "Income statement, current stock price, geopolitical issues, and insider trading activities" 
+    "You're an investment consultant, advising a community on what investments to make"
+    "You are a RAG-agent and have external resources from the datasets provided"
+    "Please output five companies and their NASDAQ symbols based on the following criteria"
+    "Income statement, current stock price, geopolitical issues, and insider trading activities"
     f"{news},{insidertrading}, {gandl} "
-    "Strictly limit your output to be five stock symbols in a single line and make sure there is nothing else" 
+    f"\nRelevant web search: {sonar_results}\n"
+    "Strictly limit your output to be five stock symbols in a single line and make sure there is nothing else"
 )
 
 completion = client.chat.completions.create(
