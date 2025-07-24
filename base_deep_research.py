@@ -5,7 +5,7 @@ client = OpenAI(
     api_key="sk-proj-Wxiayo3dxvvPv9_0HCu5B7IQbsEX7-Qzt3VWy9-"
     "s2HXUQEG4a8n4ajuI96zm46KG3vCfG3MmhuT3BlbkFJGP0u"
     "ZHGm9L2u9NN6S_nf7UTC7dEGNqjQ"
-    "r3pSbXyIbGokvYOGRmG2VOdn-pVpHcA"
+    "r3pSbXyIbGokvYOGbVRPqFOQpQGRmG2VOdn-pVpHcA"
 )
 
 def get_user_focus():
