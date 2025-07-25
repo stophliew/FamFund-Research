@@ -1,13 +1,12 @@
+industry_sector = None
 from agents import *
 import asyncio
-
 
 # Multi-Context Protocol
 message_queue = asyncio.Queue()
 
 def create_message(sender, receiver, content):
     return {"sender": sender, "receiver": receiver, "content": content}
-
 
 
 # Mixture of Experts Concept
@@ -28,8 +27,7 @@ inside_movement = Agent(name="Insider Movement Tracker",
             tools=[WebSearchTool()],
             instructions="Focus on tracking and analyzing insider trades, SEC filings, and executive movements."
             )
-# --- MCP-style message queue ---
-message_queue = asyncio.Queue()
+
 
 def create_message(sender, receiver, content):
     return {
@@ -37,6 +35,16 @@ def create_message(sender, receiver, content):
         "receiver": receiver,
         "content": content
     }
+def search(query):
+    """
+    Runs all agents with the provided query and returns their outputs as context.
+    (Blocking, synchronous for simplicity)
+    """
+    import asyncio
+    async def run_and_collect():
+        tasks = await run_all()
+        return [task.final_output for task in tasks]
+    return asyncio.run(run_and_collect())
 
 async def agent_task(agent, prompt, send_to=None, send_msg=None):
     result = await Runner.run(agent, prompt)
@@ -60,21 +68,21 @@ async def run_all():
     tasks = await asyncio.gather(
         agent_task(
             quantitative_researcher,
-            "Analyze current trends in the semiconductor and how it might affect NVDA",
+            f"Analyze current trends in the given sector {industry_sector}",
             send_to="Market Analyst",
             send_msg="Check my findings for possible market sentiment changes."
         ),
         agent_task(
             market_analyst,
-            "Analyze current trends in the semiconductor",
+            f"Analyze current trends in the given sector {industry_sector} ",
             send_to="Insider Movement Tracker",
-            send_msg="Let me know about any big insider trades in semis."
+            send_msg="Let me know about any big insider trades in the given industry sector."
         ),
         agent_task(
             inside_movement,
-            "Analyze current trends in the semiconductor",
+            f"Analyze current trends in the given industry sector {industry_sector}",
             send_to="Quantitative Researcher",
-            send_msg="Reporting significant insider buy/sell events for NVDA."
+            send_msg="Reporting significant insider buy/sell events."
         ),
     )
     return tasks
