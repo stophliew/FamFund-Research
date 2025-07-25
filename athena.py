@@ -1,4 +1,5 @@
 import base_agent
+import max 
 industry_sector = input("Community Focus: ").strip()
 base_agent.industry_sector = industry_sector
 from openai import OpenAI

@@ -1,6 +1,10 @@
 industry_sector = None
 from agents import *
 import asyncio
+from openai import OpenAI
+import requests
+import json
+
 
 # Multi-Context Protocol
 message_queue = asyncio.Queue()
