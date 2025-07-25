@@ -70,19 +70,19 @@ async def run_all():
             quantitative_researcher,
             f"Analyze current trends in the given sector {industry_sector}",
             send_to="Market Analyst",
-            send_msg="Check my findings for possible market sentiment changes."
+            send_msg="Check my findings for possible market sentiment changes. Concisely"
         ),
         agent_task(
             market_analyst,
             f"Analyze current trends in the given sector {industry_sector} ",
             send_to="Insider Movement Tracker",
-            send_msg="Let me know about any big insider trades in the given industry sector."
+            send_msg="Let me know about any big insider trades in the given industry sector. Concisely"
         ),
         agent_task(
             inside_movement,
             f"Analyze current trends in the given industry sector {industry_sector}",
             send_to="Quantitative Researcher",
-            send_msg="Reporting significant insider buy/sell events."
+            send_msg="Reporting significant insider buy/sell events. Concisely"
         ),
     )
     return tasks
