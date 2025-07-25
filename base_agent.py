@@ -11,19 +11,19 @@ def create_message(sender, receiver, content):
 
 # Mixture of Experts Concept
 quantitative_researcher = Agent(name="Quantitative Researcher",
-            model="gpt-4o-mini-2024-07-18",
+            model="gpt-4.1-nano-2025-04-14",
             tools=[WebSearchTool()],
             instructions="You are a quantiative researcher with extensive knowledge in finance and stocks",
             )
 
 market_analyst = Agent(name="Market Analyst", 
-            model="gpt-4o-mini-2024-07-18",
+            model="gpt-4.1-nano-2025-04-14",
             tools=[WebSearchTool()],
             instructions="Analyze market conditions, trends, and sentiment with precision. Use web data to support insights."
             )
 
 inside_movement = Agent(name="Insider Movement Tracker", 
-            model="gpt-4o-mini-2024-07-18",
+            model="gpt-4.1-nano-2025-04-14",
             tools=[WebSearchTool()],
             instructions="Focus on tracking and analyzing insider trades, SEC filings, and executive movements."
             )

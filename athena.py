@@ -4,6 +4,7 @@ base_agent.industry_sector = industry_sector
 from openai import OpenAI
 client = OpenAI()
 
+
 while True:
     user_input = input("You: ").strip()
     if user_input.lower() in {"exit", "quit"}:
