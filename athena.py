@@ -8,7 +8,6 @@ while True:
     user_input = input("You: ").strip()
     if user_input.lower() in {"exit", "quit"}:
         break
-
     if "research" in user_input.lower():
         context_chunks = base_agent.search(user_input)
         if context_chunks:
