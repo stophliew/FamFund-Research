@@ -1,7 +1,7 @@
+from openai import OpenAI
 import research_agent_mcp as research_agent_mcp 
 industry_sector = input("Community Focus: ").strip()
 research_agent_mcp.industry_sector = industry_sector
-from openai import OpenAI
 client = OpenAI()
 
 

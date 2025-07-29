@@ -39,6 +39,7 @@ portfolio_history = {
     ticker: yf.Ticker(ticker).history(period="1y")['Close'] for ticker in invested
 }
 
+
 # Comparison 
 snp500 = pd.read_html("https://en.wikipedia.org/wiki/List_of_S%26P_500_companies")[0]
 snp500['Symbol'] = snp500['Symbol'].str.replace("-",",")
